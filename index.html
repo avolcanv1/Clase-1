@@ -314,6 +314,14 @@
     font-size: 16px;
   }
 
+  #btn-menu {
+    width: 44px;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
   /* ── MENU OVERLAY ── */
   #menu-overlay {
     display: none;
@@ -437,6 +445,7 @@
 <!-- BOTTOM NAV -->
 <div id="bottom-nav">
   <button class="nav-btn" id="btn-prev">← Anterior</button>
+  <button class="nav-btn" id="btn-menu" onclick="openMenu()">☰</button>
   <button class="nav-btn" id="btn-next">Siguiente →</button>
 </div>
 
