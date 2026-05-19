@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Guion · Módulo 1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #e8d5a3;
+    --accent2: #a3c4e8;
+    --green: #7ec88a;
+    --red: #e87a7a;
+    --muted: #555;
+    --text: #e0e0e0;
+    --text2: #888;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP BAR ── */
+  #topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  #slide-counter {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text2);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  #progress-bar {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  #progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  #section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── MAIN CONTENT ── */
+  #content-area {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .slide-view {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    padding: 20px 16px 100px;
+    opacity: 0;
+    transform: translateX(30px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .slide-view.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+  .slide-view.exit-left {
+    opacity: 0;
+    transform: translateX(-30px);
+    pointer-events: none;
+  }
+
+  /* ── SLIDE COMPONENTS ── */
+  .slide-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+    letter-spacing: 0.04em;
+  }
+  .slide-tag::before {
+    content: '▸';
+    color: var(--accent);
+    font-size: 8px;
+  }
+
+  .slide-title {
+    font-family: var(--sans);
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+  }
+
+  .block-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  p.body-text {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 12px;
+    font-weight: 300;
+  }
+
+  p.body-text strong {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .say-this {
+    background: var(--surface);
+    border-left: 2px solid var(--accent);
+    padding: 12px 14px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #ccc;
+    font-style: italic;
+  }
+
+  .pregunta {
+    background: #0d1f12;
+    border: 1px solid #2d5a35;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .pregunta-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .pregunta p {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--green);
+    font-weight: 400;
+  }
+
+  .tip {
+    background: #120d1f;
+    border: 1px solid #3d2d5a;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .tip-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .tip p { font-size: 13px; line-height: 1.55; color: #b8a3e8; }
+
+  .warning {
+    background: #1f0d0d;
+    border: 1px solid #5a2d2d;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .warning p { font-size: 13px; color: var(--red); font-weight: 500; }
+
+  .duration {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text2);
+    margin-bottom: 20px;
+    letter-spacing: 0.03em;
+  }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  .numbered-list {
+    list-style: none;
+    margin-bottom: 14px;
+  }
+  .numbered-list li {
+    display: flex;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .numbered-list li:last-child { border-bottom: none; }
+  .numbered-list li .num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+    min-width: 20px;
+  }
+
+  .time-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .time-block .tb-label { font-size: 13px; color: var(--text); margin-bottom: 4px; }
+  .time-block .tb-time { font-family: var(--mono); font-size: 11px; color: var(--accent2); }
+
+  /* ── BOTTOM NAV ── */
+  #bottom-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+    gap: 12px;
+  }
+
+  .nav-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    -webkit-appearance: none;
+  }
+  .nav-btn:active { background: var(--surface2); transform: scale(0.97); }
+  .nav-btn:disabled { opacity: 0.3; pointer-events: none; }
+
+  #btn-next {
+    background: var(--accent);
+    color: #0a0a0a;
+    border-color: var(--accent);
+    font-weight: 500;
+    flex: 1;
+  }
+  #btn-next:active { background: #d4bc8a; }
+
+  #btn-prev { width: 50px; text-align: center; padding: 10px; }
+
+  /* ── MENU OVERLAY ── */
+  #menu-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 100;
+    backdrop-filter: blur(4px);
+  }
+  #menu-overlay.open { display: flex; flex-direction: column; }
+
+  #menu-inner {
+    background: var(--surface);
+    margin: auto 16px 0;
+    border-radius: 16px 16px 0 0;
+    padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
+    max-height: 75dvh;
+    overflow-y: auto;
+  }
+
+  #menu-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text2);
+    text-transform: uppercase;
+    padding: 0 20px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-item:active { background: var(--surface2); }
+  .menu-item.current { background: #1a1810; }
+
+  .menu-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text2);
+    width: 28px;
+    flex-shrink: 0;
+  }
+  .menu-item.current .menu-num { color: var(--accent); }
+
+  .menu-section-name {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.3;
+    flex: 1;
+  }
+  .menu-item.current .menu-section-name { color: #fff; font-weight: 600; }
+
+  .menu-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    opacity: 0;
+  }
+  .menu-item.current .menu-dot { opacity: 1; }
+
+  #menu-close-area {
+    flex: 1;
+    cursor: pointer;
+  }
+
+  /* ── SECTION DIVIDER SLIDES ── */
+  .section-hero {
+    text-align: center;
+    padding: 30px 0;
+  }
+  .section-hero .section-number {
+    font-family: var(--mono);
+    font-size: 60px;
+    color: var(--surface2);
+    line-height: 1;
+    margin-bottom: 8px;
+    font-weight: 300;
+  }
+  .section-hero .section-big-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .section-hero .section-period {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+
+  /* scrollbar */
+  .slide-view::-webkit-scrollbar { width: 3px; }
+  .slide-view::-webkit-scrollbar-track { background: transparent; }
+  .slide-view::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <span id="slide-counter">1 / 52</span>
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <span id="section-label">Intro</span>
+</div>
+
+<!-- CONTENT -->
+<div id="content-area" id="slides-container"></div>
+
+<!-- BOTTOM NAV -->
+<div id="bottom-nav">
+  <button class="nav-btn" id="btn-prev">←</button>
+  <button class="nav-btn" id="btn-menu" onclick="openMenu()">☰ Índice</button>
+  <button class="nav-btn" id="btn-next">Siguiente →</button>
+</div>
+
+<!-- MENU -->
+<div id="menu-overlay" onclick="handleMenuClick(event)">
+  <div id="menu-close-area"></div>
+  <div id="menu-inner">
+    <div id="menu-title">Índice de secciones</div>
+    <div id="menu-list"></div>
+  </div>
+</div>
+
+<script>
+const slides = [
+  // ─── BLOQUE 1: INTRODUCCIÓN ───
+  {
+    section: "Introducción",
+    tag: "Slide 1 — Portada",
+    title: "Bienvenida",
+    content: `
+      <p class="body-text">Dejar que la slide respire. No decir nada de inmediato. Que el grupo se acomode.</p>
+      <p class="body-text">Presentarse brevemente: nombre, trayectoria en pocas líneas, qué tipo de trabajo hacen hoy. <strong>Máx 2 minutos.</strong></p>
+      <div class="say-this">"Hoy arrancamos el primer módulo del diplomado. Esta sesión es la más conceptual de todas — no vamos a abrir Illustrator hoy. Pero lo que vemos aquí es la base de todo lo que viene."</div>
+      <div class="tip"><span class="tip-icon">💡</span><p>Si el grupo no se conoce, ronda rápida: nombre + qué hacen + por qué están aquí. Máx 30 seg por persona.</p></div>
+    `
+  },
+  {
+    section: "Introducción",
+    tag: "Slide 2 — Introducción",
+    title: "Dinámica de la sesión",
+    content: `
+      <div class="say-this">"Antes de arrancar con contenido, quiero que sepan cómo vamos a trabajar en este módulo."</div>
+      <p class="body-text">Explicar: teoría + imágenes + preguntas al grupo. Habrá pausas. El ejercicio final integra todo lo que vemos hoy.</p>
+    `
+  },
+  {
+    section: "Introducción",
+    tag: "Slide 3 — Objetivo",
+    title: "Objetivo de la sesión",
+    content: `
+      <p class="body-text">Leer el objetivo en voz alta — literalmente leerlo.</p>
+      <div class="say-this">"Los estudiantes aprenderán los fundamentos del diseño gráfico que les permitirán construir composiciones visuales coherentes y funcionales para diversos medios."</div>
+      <div class="say-this">"Lo que significa esto en la práctica: al terminar este módulo van a poder mirar cualquier pieza gráfica y entender por qué funciona — o por qué no."</div>
+      <div class="tip"><span class="tip-icon">💡</span><p>No explicar más el objetivo. La pregunta de la siguiente slide lo ancla mejor que cualquier explicación.</p></div>
+    `
+  },
+  {
+    section: "Introducción",
+    tag: "Slides 4–6 — Contenidos",
+    title: "Mapa del módulo",
+    content: `
+      <p class="body-text">Leer los cinco bloques: Historia, Principios, Tipografía, Color, Retícula.</p>
+      <div class="say-this">"Hoy vemos el 1.1 — Historia. Puede parecer el bloque más teórico y el menos útil, pero es exactamente al revés. Vamos a ver por qué."</div>
+      <p class="body-text">Al llegar a <strong>1.5 Composición con retícula</strong>:</p>
+      <div class="say-this">"Este último bloque es el que más les va a cambiar cómo ven el diseño. Pero para llegar ahí necesitamos entender de dónde viene todo esto."</div>
+    `
+  },
+
+  // ─── DEFINICIÓN ───
+  {
+    section: "Definición",
+    tag: "Slide 7 — Definición",
+    title: "¿Qué es el diseño gráfico?",
+    content: `
+      <p class="body-text">Mostrar la slide sin decir nada. Esperar 3–4 segundos.</p>
+      <div class="pregunta"><span class="pregunta-icon">❓</span><p>¿Qué es para ustedes el diseño gráfico? Díganme lo primero que se les venga a la mente.</p></div>
+      <p class="body-text">Recoger 3–4 respuestas. <strong>No corregirlas todavía.</strong> Solo escuchar.</p>
+      <p class="body-text">Las respuestas van a variar mucho — algunos dirán "hacer logos", otros "usar Photoshop". Eso está perfecto.</p>
+    `
+  },
+  {
+    section: "Definición",
+    tag: "Slide 8 — DG ≠ Illustrator",
+    title: "Diseño ≠ Software",
+    content: `
+      <div class="say-this">"Empecemos por lo que el diseño gráfico NO es."</div>
+      <div class="say-this">"El diseño gráfico no es el software. Illustrator es una herramienta — como un lápiz. Un carpintero no es su martillo."</div>
+      <div class="say-this">"Esta distinción es importante porque muchos de ustedes vienen aquí exactamente a aprender las herramientas. Y las vamos a ver. Pero el pensamiento detrás es lo que hace que las herramientas sirvan de algo."</div>
+      <div class="tip"><span class="tip-icon">💡</span><p>Si hay diseñadores de carrera en el grupo, apoyarse: "¿Tú qué dirías que es el diseño gráfico?"</p></div>
+    `
+  },
+  {
+    section: "Definición",
+    tag: "Slides 9–10 — Definiciones",
+    title: "ICOGRADA + AIGA",
+    content: `
+      <p class="body-text">Leer la definición ICOGRADA — o pedirle a alguien del grupo que la lea en voz alta.</p>
+      <div class="say-this">"El diseño gráfico es una actividad <strong>intelectual, técnica y creativa</strong>..."</div>
+      <p class="body-text">Subrayar tres palabras: <strong>intelectual, técnica, creativa</strong>.</p>
+      <div class="say-this">"No es solo una de las tres. Es las tres juntas. Eso es lo que lo hace interesante — y lo que lo hace difícil."</div>
+      <hr class="divider">
+      <p class="body-text">Slide 10 — AIGA. Destacar:</p>
+      <div class="say-this">"El diseño puede ocurrir a cualquier escala. Desde un sello postal hasta la señalización de todo un sistema de metro. Eso es lo que van a ver hoy."</div>
+    `
+  },
+  {
+    section: "Definición",
+    tag: "Slides 11–13 — @rotulos.chidos",
+    title: "Diseño en la calle",
+    content: `
+      <div class="say-this">"Antes de irnos al pasado, quiero mostrarles algo que todos conocen."</div>
+      <div class="say-this">"Esto es diseño gráfico. Está en la calle, en el puesto de la esquina. Alguien tuvo que decidir qué fuente usar, qué colores, cómo disponer el texto."</div>
+      <div class="say-this">"¿Funciona? Sí. ¿Es bello según los cánones académicos? Quizás no. Pero comunica. Y eso es diseño."</div>
+      <p class="body-text">Slide 12: mismo lugar de día. Pasar rápido — la pausa larga va en Lance Wyman.</p>
+    `
+  },
+  {
+    section: "Definición",
+    tag: "Slides 14–20 — Lance Wyman",
+    title: "México 68 — Lance Wyman",
+    content: `
+      <div class="say-this">"Y ya que estamos en México, quiero mostrarles uno de los proyectos de diseño más importantes que se han hecho en este país."</div>
+      <div class="say-this">"1968. México es sede de los Juegos Olímpicos. Le encargan el diseño a Lance Wyman — que estudió el arte prehispánico, la tradición huichol, y de ahí sacó este sistema."</div>
+      <div class="pregunta"><span class="pregunta-icon">❓</span><p>¿Alguien conocía esto? ¿Han visto este logo antes?</p></div>
+      <hr class="divider">
+      <p class="body-text"><strong>Slides 15–16</strong>: sellos postales → material expositivo.</p>
+      <div class="say-this">"Lo mismo que vieron en el logo se aplica a los sellos. El sistema es consistente — el mismo lenguaje visual funciona en cualquier formato."</div>
+      <div class="say-this">"Y no solo en papel. Mamparas gigantes, pictogramas deportivos, todo dentro del mismo sistema."</div>
+      <hr class="divider">
+      <p class="body-text"><strong>Slide 17</strong>: Atlantes de Tula.</p>
+      <div class="say-this">"Antes del término 'diseño gráfico' ya había comunicación visual. El diseño prehispánico tiene principios de composición tan rigurosos como cualquier escuela occidental."</div>
+      <hr class="divider">
+      <p class="body-text"><strong>Slides 18–20</strong>: estadio, piso aéreo.</p>
+      <div class="say-this">"Diseño que funciona desde el sello de 2 cm hasta la fachada de un estadio. Eso es consistencia de sistema."</div>
+      <div class="tip"><span class="tip-icon">💡</span><p>El piso del estadio solo cobra sentido desde arriba. Un buen diseño a veces tiene capas que no todos ven al mismo tiempo.</p></div>
+    `
+  },
+  {
+    section: "Definición",
+    tag: "Slide 21 — Pregunta",
+    title: "¿Tantas posibilidades?",
+    content: `
+      <p class="body-text">Leer la pregunta en pantalla:</p>
+      <div class="say-this">"¿Se habían imaginado que el diseño gráfico tiene tantas posibilidades?"</div>
+      <p class="body-text">Dejar que responda el grupo. 2–3 minutos de conversación libre.</p>
+      <div class="warning"><p>⚡ PAUSA natural. Si llevan más de 45 min, descansar 5 minutos aquí.</p></div>
+    `
+  },
+
+  // ─── PREHISTORIA ───
+  {
+    section: "Prehistoria",
+    isSection: true,
+    sectionNum: "02",
+    sectionTitle: "La prehistoria del diseño",
+    sectionPeriod: "Slides 22–30 · ~25 min",
+  },
+  {
+    section: "Prehistoria",
+    tag: "Slide 22 — Portada",
+    title: "La prehistoria del DG",
+    content: `
+      <div class="say-this">"Acabamos de ver un ejemplo contemporáneo. Ahora vamos al origen. ¿Desde cuándo existe la comunicación visual?"</div>
+    `
+  },
+  {
+    section: "Prehistoria",
+    tag: "Slide 23 — Pregunta",
+    title: "¿Por qué estudiar historia?",
+    content: `
+      <div class="pregunta"><span class="pregunta-icon">❓</span><p>¿Para qué creen que sirve conocer la historia del diseño? ¿Qué les puede dar que no tienen ya?</p></div>
+      <p class="body-text">Recoger respuestas. Posibles: inspiración, evitar reinventar la rueda, entender por qué las cosas se ven como se ven.</p>
+      <div class="say-this">"Exactamente. Y hay algo más: cuando conoces la historia, puedes <strong>citar conscientemente</strong> en lugar de copiar inconscientemente."</div>
+    `
+  },
+  {
+    section: "Prehistoria",
+    tag: "Slide 24 — Argelia",
+    title: "Pinturas rupestres · 10,000 a.C.",
+    content: `
+      <div class="say-this">"Lo más antiguo que vamos a ver hoy. Pinturas rupestres en Argelia. 10,000 a.C."</div>
+      <div class="say-this">"Alguien tomó pigmento mineral y lo aplicó en piedra para representar animales, movimiento, cacería. ¿Por qué? Para comunicar."</div>
+      <div class="say-this">"La intención no es diferente a la de un infographic de hoy: mostrar algo complejo de manera visual."</div>
+    `
+  },
+  {
+    section: "Prehistoria",
+    tag: "Slide 25 — Mesopotamia",
+    title: "Cuneiforme · 3,500 a.C.",
+    content: `
+      <div class="say-this">"Cuneiforme, la escritura más antigua conocida. Mesopotamia, hoy Irak."</div>
+      <div class="say-this">"Alguien diseñó un sistema de signos, y alguien imprimió esos signos en un soporte. Si lo piensan, eso es básicamente lo que hace un tipógrafo hoy."</div>
+    `
+  },
+  {
+    section: "Prehistoria",
+    tag: "Slide 26 — Egipto",
+    title: "Libro de los Muertos · 1,540 a.C.",
+    content: `
+      <div class="say-this">"Fíjense: hay texto, hay imagen, hay jerarquía visual, hay color. Las figuras más grandes son más importantes. El texto acompaña a la imagen y la explica."</div>
+      <div class="say-this">"Esto es diseño editorial. Tiene 3,500 años."</div>
+      <div class="tip"><span class="tip-icon">💡</span><p>Señalar la línea divisoria entre registros. Ya hay retícula aquí — hace 3,500 años.</p></div>
+    `
+  },
+  {
+    section: "Prehistoria",
+    tag: "Slides 27–28 — Manuscritos",
+    title: "Manuscritos iluminados · 500–1600",
+    content: `
+      <div class="say-this">"Antes de la imprenta, los libros se copiaban a mano — uno por uno. Meses de trabajo por volumen."</div>
+      <div class="say-this">"Los monjes que los hacían eran, entre otras cosas, diseñadores. Decidían el tamaño de la letra, el margen, la proporción de texto e imagen."</div>
+      <p class="body-text">Slide 28 — segunda imagen:</p>
+      <div class="say-this">"Noten que el texto está en columnas. La columna como unidad de organización del texto tiene más de mil años."</div>
+    `
+  },
+  {
+    section: "Prehistoria",
+    tag: "Slides 29–30 — Gutenberg",
+    title: "Imprenta · 1450",
+    content: `
+      <div class="say-this">"1450. Esta es una imprenta de tipos móviles."</div>
+      <div class="say-this">"El cambio que produce la imprenta es radical: por primera vez en la historia es posible reproducir texto en masa. Esto cambia todo: la política, la religión, el comercio. Y el diseño."</div>
+      <div class="say-this">"El diseñador ya no solo hace una pieza — ahora tiene que pensar en que esa pieza se va a reproducir miles de veces. El diseño se vuelve <strong>sistema</strong>."</div>
+      <p class="body-text">Slide 30 — Biblia de Gutenberg:</p>
+      <div class="say-this">"Gutenberg intentó que se pareciera a los manuscritos que ya existían. Las innovaciones tecnológicas casi siempre imitan lo anterior antes de encontrar su propio lenguaje."</div>
+      <div class="pregunta"><span class="pregunta-icon">❓</span><p>¿En qué otros contextos han visto que la tecnología nueva imita a la anterior? (el email se llamó 'correo', las primeras películas grababan obras de teatro...)</p></div>
+    `
+  },
+
+  // ─── ART NOUVEAU ───
+  {
+    section: "Art Nouveau",
+    isSection: true,
+    sectionNum: "03",
+    sectionTitle: "Art Nouveau",
+    sectionPeriod: "1880–1910 · Slides 31–39 · ~20 min",
+  },
+  {
+    section: "Art Nouveau",
+    tag: "Slide 31 — Portada",
+    title: "El primer movimiento moderno",
+    content: `
+      <div class="say-this">"Llegamos al siglo XIX. Este es el momento en que el diseño gráfico empieza a existir como profesión. Hay un nombre para él, hay mercado, hay clientes."</div>
+      <div class="say-this">"El Art Nouveau es el primer gran movimiento de diseño moderno. Dura apenas treinta años, pero su influencia llega hasta hoy."</div>
+    `
+  },
+  {
+    section: "Art Nouveau",
+    tag: "Slide 32 — Contexto",
+    title: "La Revolución Industrial crea la profesión",
+    content: `
+      <div class="say-this">"¿Por qué surge en este momento? Porque la Revolución Industrial cambió la economía: hay más productos, más negocios, más competencia. Y todo eso necesita comunicación visual."</div>
+      <div class="say-this">"El cartel publicitario nace en este momento. Las revistas, los catálogos, los empaques modernos. El mercado crea la demanda y la demanda crea la profesión."</div>
+    `
+  },
+  {
+    section: "Art Nouveau",
+    tag: "Slide 33 — Características",
+    title: "Características · Chat Noir",
+    content: `
+      <p class="body-text">Leer las características de la slide mientras se señalan en el cartel del Chat Noir:</p>
+      <ul class="numbered-list">
+        <li><span class="num">→</span>Formas orgánicas y naturales: la curva del gato, las líneas del fondo.</li>
+        <li><span class="num">→</span>Tipografía decorativa: la fuente del título que remite a formas vegetales.</li>
+        <li><span class="num">→</span>Arte integrado a la vida cotidiana: esto es un cartel de bar, para la calle.</li>
+      </ul>
+    `
+  },
+  {
+    section: "Art Nouveau",
+    tag: "Slides 34–36 — Toulouse-Lautrec",
+    title: "Toulouse-Lautrec · Francia",
+    content: `
+      <div class="say-this">"Henri de Toulouse-Lautrec. Pintor y cartelista. Conocido por sus carteles del Moulin Rouge."</div>
+      <p class="body-text">Slide 35 — Moulin Rouge, 1891:</p>
+      <div class="say-this">"El cartel es para verse desde lejos, de pasada. Tiene que comunicar en segundos. Por eso la composición es tan directa."</div>
+      <div class="pregunta"><span class="pregunta-icon">❓</span><p>¿Qué lo hace fácil de leer a distancia?</p></div>
+      <p class="body-text">Slide 36 — Divan Japonais:</p>
+      <div class="say-this">"El uso de áreas planas de color sin degradados viene de la influencia del grabado japonés. Uno de los primeros casos de apropiación cultural consciente en el diseño."</div>
+    `
+  },
+  {
+    section: "Art Nouveau",
+    tag: "Slides 37–39 — Alphonse Mucha",
+    title: "Alphonse Mucha · República Checa",
+    content: `
+      <div class="say-this">"Si Toulouse-Lautrec tenía un estilo crudo y expresivo, Mucha es ornamental, simétrico, decorativo al máximo."</div>
+      <p class="body-text">Slide 38 — Gismonda, 1894:</p>
+      <div class="say-this">"Este cartel lo hizo en una noche de Año Nuevo, por encargo urgente. Bernhardt lo necesitaba para el día siguiente. Mucha lo terminó en horas — y fue tan bello que Bernhardt lo contrató para toda su publicidad."</div>
+      <p class="body-text">Slide 39 — Rêverie, 1897:</p>
+      <div class="say-this">"¿Les recuerda algo que ven hoy? Busquen en Instagram cuentas de ilustración — el estilo de Mucha está completamente de moda ahora. El Art Nouveau es cíclico."</div>
+      <div class="pregunta"><span class="pregunta-icon">❓</span><p>¿Han visto este estilo en algún producto o marca contemporánea?</p></div>
+    `
+  },
+
+  // ─── BAUHAUS ───
+  {
+    section: "Bauhaus",
+    isSection: true,
+    sectionNum: "04",
+    sectionTitle: "Bauhaus",
+    sectionPeriod: "1919–1933 · Slides 40–50 · ~25 min",
+  },
+  {
+    section: "Bauhaus",
+    tag: "Slide 40 — Portada",
+    title: "La reacción al ornamento",
+    content: `
+      <div class="warning"><p>⚡ PAUSA recomendada si llevan más de 1:30 h de clase.</p></div>
+      <div class="say-this">"Si el Art Nouveau reaccionó contra la frialdad industrial poniendo más ornamento, la Bauhaus reaccionó al revés: eliminó todo el ornamento."</div>
+      <div class="say-this">"La Bauhaus es la escuela de diseño más influyente de la historia. Duró solo 14 años — la cerraron los nazis en 1933. Pero cambió absolutamente todo."</div>
+    `
+  },
+  {
+    section: "Bauhaus",
+    tag: "Slide 41 — Contexto",
+    title: "La forma sigue a la función",
+    content: `
+      <div class="say-this">"Fundada en 1919 por Walter Gropius en Weimar, Alemania. La premisa: unir arte, diseño y tecnología en una misma escuela."</div>
+      <div class="say-this">"El lema: 'la forma sigue a la función'. Un objeto bien diseñado no necesita decoración — su belleza viene de hacer perfectamente lo que tiene que hacer."</div>
+      <div class="pregunta"><span class="pregunta-icon">❓</span><p>¿Cuál de los dos enfoques les parece más vigente hoy? ¿El ornamental o el funcional?</p></div>
+    `
+  },
+  {
+    section: "Bauhaus",
+    tag: "Slides 42–45 — Objetos",
+    title: "Ballet Triádico + Sillas Breuer",
+    content: `
+      <p class="body-text">Slide 42 — Ballet Triádico:</p>
+      <div class="say-this">"¿Por qué mostrar un ballet en clase de diseño gráfico? Porque la Bauhaus no era solo diseño gráfico — era diseño total. Todo bajo el mismo principio: forma + función."</div>
+      <p class="body-text">Slides 43–44 — Silla Wassily:</p>
+      <div class="say-this">"Esta silla se diseñó en 1925. Cien años después se sigue produciendo y vendiendo. Eso es diseño que resiste el tiempo porque parte de principios, no de modas."</div>
+      <p class="body-text">Slide 45 — Silla Cesca:</p>
+      <div class="say-this">"El diseño encaja en cualquier contexto porque no pretende pertenecer a ninguno en particular."</div>
+    `
+  },
+  {
+    section: "Bauhaus",
+    tag: "Slides 46–50 — Diseño gráfico Bauhaus",
+    title: "Herbert Bayer + Futura",
+    content: `
+      <p class="body-text">Slide 46 — Cartel Bauhaus:</p>
+      <div class="say-this">"Negro, amarillo, rojo. Sin imagen. Solo tipo y geometría. ¿Lo ven hoy en algún lugar? El estilo Bauhaus es el mismo que ven en el branding de muchas empresas tech."</div>
+      <p class="body-text">Slides 47–48 — Herbert Bayer:</p>
+      <div class="say-this">"El color no es decorativo — articula jerarquía. Sin serifas: la Bauhaus prefería las fuentes sans-serif porque las consideraba más 'honestas'."</div>
+      <p class="body-text">Slides 49–50 — Futura:</p>
+      <div class="say-this">"Paul Renner diseñó la Futura en 1927. 'El tipo del futuro.' La O es un círculo perfecto, la A es un triángulo. La Futura es una de las tipografías más usadas de la historia. Volkswagen la usa. Nike la usa. La NASA la usó en la placa del Apollo 11."</div>
+      <div class="tip"><span class="tip-icon">💡</span><p>Buscarla en el teléfono — muchas apps la usan o tienen fuentes derivadas de ella.</p></div>
+    `
+  },
+
+  // ─── ESTILO INTERNACIONAL ───
+  {
+    section: "Estilo Internacional",
+    isSection: true,
+    sectionNum: "05",
+    sectionTitle: "Estilo Internacional",
+    sectionPeriod: "1950–1970 · Slides 51–65 · ~25 min",
+  },
+  {
+    section: "Estilo Internacional",
+    tag: "Slides 51–53 — Contexto",
+    title: "Comunicación visual universal",
+    content: `
+      <div class="say-this">"La Bauhaus se clausuró en 1933. Pero sus maestros emigraron — a EE.UU., a Suiza, a toda Europa. Y sus ideas se expandieron."</div>
+      <div class="say-this">"En los años 50, Suiza desarrolla el Estilo Internacional. Es la culminación de las ideas Bauhaus llevadas al máximo rigor."</div>
+      <div class="say-this">"Objetivo: crear un lenguaje visual universal. Que funcione en cualquier idioma, en cualquier cultura."</div>
+      <p class="body-text">Slide 53 — Características + Grid Systems:</p>
+      <div class="say-this">"La retícula no es una restricción — es una estructura que libera. Cuando sabes dónde va cada elemento, puedes tomar decisiones más rápido y con más consistencia."</div>
+      <div class="tip"><span class="tip-icon">💡</span><p>Este es el concepto más directamente ligado al ejercicio final. Subrayarlo.</p></div>
+    `
+  },
+  {
+    section: "Estilo Internacional",
+    tag: "Slides 54–60 — Müller-Brockmann",
+    title: "Josef Müller-Brockmann",
+    content: `
+      <p class="body-text"><strong>Slide 55</strong> — Schützt das Kind, 1954:</p>
+      <div class="say-this">"'Protege al niño'. Una llanta gigante que aplasta al niño. Sin texto redundante. La imagen dice todo. Esto es comunicación visual directa: un mensaje complejo transmitido en un segundo."</div>
+      <p class="body-text"><strong>Slide 56</strong> — de Film, 1960:</p>
+      <div class="say-this">"Solo tipografía. No hay imagen. El tamaño y el posicionamiento de la palabra 'Film' hacen todo el trabajo. La tipografía como imagen."</div>
+      <p class="body-text"><strong>Slide 57</strong> — Beethoven:</p>
+      <div class="say-this">"Franjas naranjas y blancas que representan el ritmo de la música. Textura visual que comunica sonido."</div>
+      <p class="body-text"><strong>Slide 58</strong> — Moins de bruit:</p>
+      <div class="say-this">"Aquí Müller-Brockmann rompe la retícula — el texto va en diagonal. No porque no supiera usarla, sino porque sabe exactamente cuándo romperla para generar tensión."</div>
+      <p class="body-text"><strong>Slide 59</strong> — La retícula:</p>
+      <div class="say-this">"Las líneas que estructuran la página son invisibles en el resultado final. Pero están ahí. Son la razón por la que todo se ve ordenado."</div>
+    `
+  },
+  {
+    section: "Estilo Internacional",
+    tag: "Slides 61–65 — Armin Hofmann",
+    title: "Armin Hofmann",
+    content: `
+      <div class="say-this">"Armin Hofmann. Suizo. Contemporáneo de Müller-Brockmann, pero con un estilo más expresivo dentro del mismo rigor."</div>
+      <p class="body-text">Slide 62 — Das Holz als Baustoff:</p>
+      <div class="say-this">"Solo tipografía. La disposición de las letras — rotadas, amontonadas — evoca la construcción. La forma es el mensaje."</div>
+      <p class="body-text">Slides 63–65:</p>
+      <div class="say-this">"Si Toulouse-Lautrec era seducción y ornamento, Hofmann es austeridad y tensión. Dos extremos del diseño occidental."</div>
+    `
+  },
+
+  // ─── POSTMODERNISMO ───
+  {
+    section: "Postmodernismo",
+    isSection: true,
+    sectionNum: "06",
+    sectionTitle: "Postmodernismo",
+    sectionPeriod: "Desde 1970 · Slides 66–84 · ~35 min",
+  },
+  {
+    section: "Postmodernismo",
+    tag: "Slides 66–68 — Contexto",
+    title: "La reacción al rigor suizo",
+    content: `
+      <div class="warning"><p>⚡ SEGUNDA PAUSA recomendada aquí si no se ha hecho antes.</p></div>
+      <div class="say-this">"En los años 70 llega alguien que dice: ¿para qué tanta retícula? El Postmodernismo es una reacción directa contra la rigidez del Estilo Internacional."</div>
+      <div class="say-this">"Si el suizo era serio, el postmoderno es irónico. Si el suizo eliminaba el ornamento, el postmoderno lo recupera — pero de manera consciente, a propósito."</div>
+      <p class="body-text">Slide 68 — Características + Lou Reed:</p>
+      <div class="say-this">"Texto escrito literalmente en su cara. Completamente ilegible en algunos lugares. Pero ese es el punto."</div>
+      <div class="pregunta"><span class="pregunta-icon">❓</span><p>¿Están de acuerdo? ¿Puede el diseño sacrificar legibilidad por impacto?</p></div>
+      <p class="body-text">Dejar que el grupo debata brevemente. No hay respuesta correcta — es una tensión legítima en el diseño.</p>
+    `
+  },
+  {
+    section: "Postmodernismo",
+    tag: "Slides 69–73 — April Greiman",
+    title: "April Greiman · EEUU",
+    content: `
+      <div class="say-this">"Una de las primeras diseñadoras en usar la computadora como herramienta de diseño, en los años 80, cuando nadie lo hacía."</div>
+      <p class="body-text">Slide 70 — WET Magazine, 1978:</p>
+      <div class="say-this">"Lo que ven es el diseño aprendiendo a usar nuevas herramientas — como Gutenberg aprendió a usar el metal fundido."</div>
+      <p class="body-text">Slide 72 — Cartel LAICA, 1986:</p>
+      <div class="say-this">"El pixel como elemento gráfico consciente. Mostrar la herramienta en lugar de ocultarla."</div>
+    `
+  },
+  {
+    section: "Postmodernismo",
+    tag: "Slides 74–77 — David Carson",
+    title: "David Carson · Ray Gun",
+    content: `
+      <div class="say-this">"David Carson. El más radical de todos los postmodernos. No tenía formación formal en diseño — era sociólogo y surfista profesional."</div>
+      <div class="say-this">"Carson tenía una regla: nunca hacer algo que ya se hubiera hecho. Si ya existía, no le interesaba."</div>
+      <div class="tip"><span class="tip-icon">💡</span><p>Comparar con Müller-Brockmann: son el opuesto absoluto. Ambos son diseño. Ambos funcionan — para audiencias diferentes, con objetivos diferentes.</p></div>
+    `
+  },
+  {
+    section: "Postmodernismo",
+    tag: "Slides 78–81 — Paula Scher",
+    title: "Paula Scher · Public Theater",
+    content: `
+      <div class="say-this">"La más importante diseñadora de identidad de los últimos 40 años. Socia de Pentagram. Ha diseñado la identidad del Public Theater, Citibank, Tiffany's, Windows."</div>
+      <p class="body-text">Slide 79 — The Diva is Dismissed:</p>
+      <div class="say-this">"Scher tomó la tipografía histórica del siglo XX — los carteles del circo americano — y los actualizó. Cita consciente de la historia."</div>
+      <div class="say-this">"¿Recuerdan lo que dijimos antes? Quien conoce la historia puede citar en lugar de copiar. Esto es exactamente eso."</div>
+      <p class="body-text">Slide 81 — Sistema de temporada:</p>
+      <div class="say-this">"Eso es sistema de diseño. Lo que hará el grupo en el ejercicio final es exactamente esto a escala: un sistema visual para 9 posts de Instagram."</div>
+    `
+  },
+  {
+    section: "Postmodernismo",
+    tag: "Slides 82–84 — Stefan Sagmeister",
+    title: "Stefan Sagmeister",
+    content: `
+      <div class="say-this">"Stefan Sagmeister. Austríaco. El diseñador más conceptual de su generación. Sus trabajos trascienden el cartel — son declaraciones artísticas."</div>
+      <p class="body-text">Slide 83 — Portadas de libro:</p>
+      <div class="say-this">"Una variable (el patrón) sobre un elemento constante (la cara). El resultado es coherencia con variación. También eso es sistema."</div>
+      <p class="body-text">Slide 84 — Having, tipografía en el bosque:</p>
+      <div class="say-this">"Sagmeister hace tipografía con cualquier cosa: pelos, comida, objetos, paisajes. La letra puede ser cualquier cosa siempre que se lea."</div>
+      <div class="pregunta"><span class="pregunta-icon">❓</span><p>¿Dónde han visto tipografía hecha de objetos cotidianos?</p></div>
+    `
+  },
+
+  // ─── ACTIVIDAD ───
+  {
+    section: "¿Siglo XX o Contemporáneo?",
+    isSection: true,
+    sectionNum: "07",
+    sectionTitle: "¿Siglo XX o\nContemporáneo?",
+    sectionPeriod: "Slides 86–105 · Actividad interactiva",
+  },
+  {
+    section: "¿Siglo XX o Contemporáneo?",
+    tag: "Slide 86 — Actividad",
+    title: "Reglas de la actividad",
+    content: `
+      <div class="say-this">"Vamos a hacer un ejercicio rápido. Les voy a mostrar imágenes y me dicen si creen que son del siglo XX — antes del año 2000 — o contemporáneas."</div>
+      <div class="say-this">"No les digo la respuesta todavía. Solo me interesan sus intuiciones."</div>
+    `
+  },
+  {
+    section: "¿Siglo XX o Contemporáneo?",
+    tag: "Slides 87–105 — Comparativos",
+    title: "Claves para cada imagen",
+    content: `
+      <ul class="numbered-list">
+        <li><span class="num">87/88</span>Mike Joyce, poster Samiam → estilo Bauhaus. Mayoría pensará que es vintage. <strong>Es 2013.</strong></li>
+        <li><span class="num">89/90</span>Herbert Matter, Pontresina → se ve muy moderno. <strong>Es 1935.</strong></li>
+        <li><span class="num">91/92</span>Christoph Nieman, New Yorker → <strong>Contemporáneo, 2016.</strong></li>
+        <li><span class="num">93/94</span>André Baldinger → lenguaje del Estilo Internacional. <strong>Contemporáneo, 2006.</strong></li>
+        <li><span class="num">95/96</span>Massimo Vignelli, metro NY → se ve muy actual. <strong>Es 1970.</strong> Lo retiraron en 1979 por quejas. Hoy es obra maestra.</li>
+        <li><span class="num">97/98</span>Marek Freudenreich → Escuela polaca de cartelismo. <strong>Siglo XX, 1966.</strong></li>
+        <li><span class="num">99/100</span>Experimental Jetset → <strong>Contemporáneo, 2015.</strong></li>
+        <li><span class="num">101/102</span>Edward Young, Penguin → <strong>Siglo XX, 1935.</strong> ¿Funciona hoy? Completamente.</li>
+        <li><span class="num">103/104</span>Pablo Lvalley → lenguaje de los 70s. <strong>Contemporáneo, 2014.</strong></li>
+      </ul>
+      <hr class="divider">
+      <div class="say-this">"¿Qué nos dice esto? Que el diseño no envejece cuando parte de principios sólidos. La Bauhaus de 1919 se ve vigente hoy."</div>
+      <div class="say-this">"Las modas pasan. Los principios permanecen. Por eso estudiamos historia — no para repetirla, sino para entender qué funciona siempre."</div>
+    `
+  },
+
+  // ─── EJERCICIO ───
+  {
+    section: "Ejercicio Final",
+    isSection: true,
+    sectionNum: "08",
+    sectionTitle: "Ejercicio Final",
+    sectionPeriod: "Slides 107–110 · ~20 min",
+  },
+  {
+    section: "Ejercicio Final",
+    tag: "Slides 105–106 — Referencias",
+    title: "Diseño actual · Referencias",
+    content: `
+      <div class="say-this">"Para cerrar la parte histórica, les muestro diseño que se está haciendo ahora mismo."</div>
+      <p class="body-text">Cuentas para seguir:</p>
+      <ul class="numbered-list">
+        <li><span class="num">@</span>thebrandidentity</li>
+        <li><span class="num">@</span>themovingposters</li>
+        <li><span class="num">@</span>digital_archive</li>
+        <li><span class="num">@</span>contemporarytype</li>
+        <li><span class="num">@</span>designreviewed</li>
+      </ul>
+      <div class="say-this">"Ven el ADN de todo lo que vimos hoy: la síntesis del Art Nouveau en la ilustración, el rigor del Estilo Internacional en el branding, la ruptura del Postmodernismo en el cartel."</div>
+    `
+  },
+  {
+    section: "Ejercicio Final",
+    tag: "Slide 107 — Ejercicio",
+    title: "Retícula de Instagram · 9 posts",
+    content: `
+      <div class="say-this">"El ejercicio que van a entregar el <strong>17 de octubre</strong> integra todo lo que vimos hoy."</div>
+      <p class="body-text"><strong>Retícula de Instagram de 9 posts para un negocio, proyecto personal o afición.</strong></p>
+      <ul class="numbered-list">
+        <li><span class="num">1.</span>Idea y referencias</li>
+        <li><span class="num">2.</span>Recurso gráfico principal</li>
+        <li><span class="num">3.</span>Tipografía</li>
+        <li><span class="num">4.</span>Color</li>
+        <li><span class="num">5.</span>Composición</li>
+      </ul>
+      <div class="say-this">"La herramienta es Figma. Si no tienen cuenta, la crean gratis en figma.com. La próxima sesión hacemos un tour de la interfaz."</div>
+      <div class="say-this">"Fecha de entrega: <strong>17 de octubre</strong>."</div>
+    `
+  },
+  {
+    section: "Ejercicio Final",
+    tag: "Slides 108–110 — Referencias ejercicio",
+    title: "Mood boards · Ejemplos",
+    content: `
+      <div class="say-this">"Estos son ejemplos del tipo de trabajo que pueden hacer. No tienen que hacer algo como esto exactamente. Tienen que hacer algo que sea <strong>consistente</strong> — que los 9 posts se vean como parte del mismo sistema visual."</div>
+      <div class="say-this">"Cada post tiene que funcionar solo Y como parte del conjunto. Esa es la dificultad del ejercicio."</div>
+      <hr class="divider">
+      <div class="say-this">"Hay espacio para el minimalismo y para el maximalismo. Para lo tipográfico y para lo ilustrado. Para lo serio y para lo irónico. Lo que no hay espacio es para lo <strong>arbitrario</strong> — para las decisiones sin intención."</div>
+    `
+  },
+
+  // ─── CIERRE ───
+  {
+    section: "Cierre",
+    isSection: true,
+    sectionNum: "09",
+    sectionTitle: "Cierre",
+    sectionPeriod: "5 min",
+  },
+  {
+    section: "Cierre",
+    tag: "Cierre de sesión",
+    title: "Reflexión + Tarea",
+    content: `
+      <div class="pregunta"><span class="pregunta-icon">❓</span><p>De todo lo que vieron hoy, ¿qué fue lo más sorprendente? ¿Qué cambió en cómo ven el diseño?</p></div>
+      <p class="body-text">Recoger 2–3 respuestas. No es evaluación — es consolidación.</p>
+      <hr class="divider">
+      <p class="block-label">Para la próxima sesión</p>
+      <ul class="numbered-list">
+        <li><span class="num">1.</span>Crear cuenta en Figma si no la tienen.</li>
+        <li><span class="num">2.</span>Elegir el tema para el ejercicio final.</li>
+        <li><span class="num">3.</span>Recolectar 10 referencias visuales que los inspiren.</li>
+      </ul>
+      <hr class="divider">
+      <p class="block-label">Tiempos totales</p>
+      <div class="time-block"><div class="tb-label">Introducción + Definición</div><div class="tb-time">~40 min</div></div>
+      <div class="time-block"><div class="tb-label">Prehistoria</div><div class="tb-time">~25 min</div></div>
+      <div class="time-block"><div class="tb-label">Art Nouveau</div><div class="tb-time">~20 min</div></div>
+      <div class="time-block"><div class="tb-label">[ Pausa ]</div><div class="tb-time">10 min</div></div>
+      <div class="time-block"><div class="tb-label">Bauhaus</div><div class="tb-time">~25 min</div></div>
+      <div class="time-block"><div class="tb-label">Estilo Internacional</div><div class="tb-time">~25 min</div></div>
+      <div class="time-block"><div class="tb-label">[ Pausa ]</div><div class="tb-time">10 min</div></div>
+      <div class="time-block"><div class="tb-label">Postmodernismo + Actividad</div><div class="tb-time">~45 min</div></div>
+      <div class="time-block"><div class="tb-label">Referencias + Ejercicio + Cierre</div><div class="tb-time">~25 min</div></div>
+      <div class="time-block" style="border-color: var(--accent); background: #1a1810;">
+        <div class="tb-label" style="color: #fff; font-weight: 600;">TOTAL</div>
+        <div class="tb-time" style="color: var(--accent); font-size: 14px;">~3:30 – 4:00 horas</div>
+      </div>
+    `
+  },
+];
+
+// ── RENDER ──
+let current = 0;
+const container = document.getElementById('content-area');
+const progressFill = document.getElementById('progress-fill');
+const slideCounter = document.getElementById('slide-counter');
+const sectionLabel = document.getElementById('section-label');
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
+const total = slides.length;
+
+function buildSlide(slide, index) {
+  const div = document.createElement('div');
+  div.className = 'slide-view';
+  div.dataset.index = index;
+
+  if (slide.isSection) {
+    div.innerHTML = `
+      <div class="section-hero">
+        <div class="section-number">${slide.sectionNum}</div>
+        <div class="section-big-title">${slide.sectionTitle.replace('\n','<br>')}</div>
+        <div class="section-period">${slide.sectionPeriod}</div>
+      </div>
+    `;
+  } else {
+    div.innerHTML = `
+      <div class="slide-tag">${slide.tag}</div>
+      <div class="slide-title">${slide.title}</div>
+      ${slide.content}
+    `;
+  }
+  return div;
+}
+
+// Build all slides
+const slideEls = slides.map((s, i) => {
+  const el = buildSlide(s, i);
+  container.appendChild(el);
+  return el;
+});
+
+function updateUI() {
+  const slide = slides[current];
+  progressFill.style.width = `${((current + 1) / total) * 100}%`;
+  slideCounter.textContent = `${current + 1} / ${total}`;
+  sectionLabel.textContent = slide.section;
+  btnPrev.disabled = current === 0;
+  btnNext.textContent = current === total - 1 ? '✓ Fin' : 'Siguiente →';
+}
+
+function goTo(index, direction = 1) {
+  if (index < 0 || index >= total) return;
+
+  const oldEl = slideEls[current];
+  const newEl = slideEls[index];
+
+  oldEl.classList.remove('active');
+  oldEl.classList.add(direction > 0 ? 'exit-left' : 'exit-right');
+
+  newEl.style.transform = `translateX(${direction > 0 ? '30px' : '-30px'})`;
+  newEl.style.opacity = '0';
+  newEl.classList.add('active');
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      newEl.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+      newEl.style.transform = 'translateX(0)';
+      newEl.style.opacity = '1';
+      newEl.scrollTop = 0;
+    });
+  });
+
+  setTimeout(() => {
+    oldEl.classList.remove('exit-left', 'exit-right');
+    oldEl.style.transform = '';
+    oldEl.style.opacity = '';
+  }, 300);
+
+  current = index;
+  updateUI();
+}
+
+// Init
+slideEls[0].classList.add('active');
+updateUI();
+
+btnNext.addEventListener('click', () => {
+  if (current < total - 1) goTo(current + 1, 1);
+});
+btnPrev.addEventListener('click', () => {
+  if (current > 0) goTo(current - 1, -1);
+});
+
+// Swipe support
+let touchStartX = 0;
+let touchStartY = 0;
+container.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+container.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) > 50) {
+    if (dx < 0 && current < total - 1) goTo(current + 1, 1);
+    if (dx > 0 && current > 0) goTo(current - 1, -1);
+  }
+}, { passive: true });
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1, 1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1, -1);
+});
+
+// Menu
+function openMenu() {
+  const overlay = document.getElementById('menu-overlay');
+  const list = document.getElementById('menu-list');
+  list.innerHTML = '';
+
+  // Group by section
+  const seen = new Set();
+  slides.forEach((slide, i) => {
+    const key = slide.section;
+    if (!seen.has(key)) {
+      seen.add(key);
+      const first = slides.findIndex(s => s.section === key);
+      const item = document.createElement('div');
+      item.className = 'menu-item' + (slide.section === slides[current].section ? ' current' : '');
+      item.innerHTML = `
+        <span class="menu-num">${String(first + 1).padStart(2, '0')}</span>
+        <span class="menu-section-name">${key}</span>
+        <span class="menu-dot"></span>
+      `;
+      item.addEventListener('click', () => {
+        goTo(first, first > current ? 1 : -1);
+        closeMenu();
+      });
+      list.appendChild(item);
+    }
+  });
+
+  overlay.classList.add('open');
+}
+
+function closeMenu() {
+  document.getElementById('menu-overlay').classList.remove('open');
+}
+
+function handleMenuClick(e) {
+  if (e.target === document.getElementById('menu-overlay') || e.target === document.getElementById('menu-close-area')) {
+    closeMenu();
+  }
+}
+</script>
+</body>
+</html>
